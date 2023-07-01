@@ -1,15 +1,14 @@
 package com.comcast.genericutlity;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.checkerframework.checker.units.qual.s;
 /**
  * used to perfrom Workbook releated operations like read , write , getcount etc
  * @author Deepak
@@ -98,9 +97,19 @@ public class ExcelUtlity {
 	 * @param columnHeader
 	 * @param data
 	 */
-	public void setdataToExcel(String filePath, String sheetName , String testId, String columnHeader , String data){
+	public void setDataExcel(String filePath, String sheetName , int rowNum, int celNum ,String data) throws Throwable {
+		FileInputStream fis  = new FileInputStream(filePath);
+		Workbook wb = WorkbookFactory.create(fis);
+		Sheet sh = wb.getSheet(sheetName);
+		Row row = sh.getRow(rowNum);
+		Cell cel = row.createCell(celNum);
+		cel.setCellValue(data);
+		FileOutputStream fos = new FileOutputStream(filePath);
+		wb.write(fos);
+		wb.close();
 		
 	}
+
 
 }
 
