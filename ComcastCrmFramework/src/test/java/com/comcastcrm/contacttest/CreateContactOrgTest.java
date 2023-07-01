@@ -26,6 +26,8 @@ import org.testng.annotations.Test;
 
 import com.comcast.genericutlity.ExcelUtlity;
 import com.comcast.genericutlity.FileUtlity;
+import com.comcast.genericutlity.JavaUtlity;
+import com.comcast.genericutlity.WebActionUtility;
 
 
 
@@ -36,6 +38,8 @@ public class CreateContactOrgTest {
 		/*create Object for utlity */
 		FileUtlity fLib = new FileUtlity();
 		ExcelUtlity eLib = new ExcelUtlity();
+		JavaUtlity jLib = new JavaUtlity();
+		WebActionUtility wLib = new WebActionUtility();
 		
 		/*get the FILE PATH*/
        String ENV_FILE_PATH =    fLib.getFilePathFromPropertiesFile("projectConfigDataFilePath");
@@ -48,7 +52,7 @@ public class CreateContactOrgTest {
 	   String PASSWORd = fLib.getDataFromProperties(ENV_FILE_PATH, "password");
 
 		/*test script data*/
-		int randomNum = new Random().nextInt(3000);
+	   int randomNum = jLib.getRandomNumber();
 		
 		  String orgName = eLib.getDataFromExcelBasedTestId(TEST_SCRIPT_EXCEL_FILE_PATH, "contact", "tc_06", "OrgName") +"_"+ randomNum;
 		  String lastName = eLib.getDataFromExcelBasedTestId(TEST_SCRIPT_EXCEL_FILE_PATH, "contact", "tc_06", "ContactLastName") +"_"+ randomNum;
@@ -66,7 +70,7 @@ public class CreateContactOrgTest {
 		}else {
 		    driver = new ChromeDriver();
 		}
-		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		wLib.waitForElementInDOM(driver);
 		driver.get(URL);
 		
 		driver.findElement(By.name("user_name")).sendKeys(USERNAME);
@@ -92,9 +96,7 @@ public class CreateContactOrgTest {
 
         }
         
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.linkText("Contacts"))));
-
+     wLib.waitForElement(driver, driver.findElement(By.xpath("//img[@alt='Create Contact...']")));
 		/*step 5 : navigate to Org page*/
 		driver.findElement(By.linkText("Contacts")).click();
 		
@@ -104,35 +106,13 @@ public class CreateContactOrgTest {
 		/*step 4 :  create a new org*/
 		driver.findElement(By.name("lastname")).sendKeys(lastName);		
 		driver.findElement(By.xpath("//input[@name='account_name']/following-sibling::img")).click();
-		
-	    Set<String> set = driver.getWindowHandles();
-	    Iterator<String> it = set.iterator();
-	
-	    while (it.hasNext()) {
-	    	String winID = it.next();
-		   driver.switchTo().window(winID);
-		   if(driver.getCurrentUrl().contains("module=Accounts")){
-			   break;
-		   }
-			
-		}
-	
+		 //switch to child window
+		wLib.swithToWindowBasedOnURL(driver, "module=Accounts");
 	    driver.findElement(By.id("search_txt")).sendKeys(orgName);
 	    driver.findElement(By.name("search")).click();
 	    driver.findElement(By.xpath("//a[text()='"+orgName+"']")).click();
-	    
-	    Set<String> set1 = driver.getWindowHandles();
-	    Iterator<String> it1 = set1.iterator();
-	
-	    while (it1.hasNext()) {
-	    	String winID = it1.next();
-		   driver.switchTo().window(winID);
-		   if(driver.getCurrentUrl().contains("module=Contacts")){
-			   break;
-		   }
-			
-		}
-	    
+	     //switch to parent window window
+	    wLib.swithToWindowBasedOnURL(driver, "module=Contacts");  
         driver.findElement(By.xpath("//input[@title='Save [Alt+S]']")).click();
         
 		 /*verify expected result*/
@@ -155,8 +135,7 @@ public class CreateContactOrgTest {
        
 		/*step 4 :  logout*/
 		WebElement ele =  driver.findElement(By.xpath("//img[@src='themes/softed/images/user.PNG']"));
-        Actions act = new Actions(driver);
-        act.moveToElement(ele).perform();
+        wLib.mouseOverOnElement(driver, ele);
 		driver.findElement(By.linkText("Sign Out")).click();
 		driver.close();
 

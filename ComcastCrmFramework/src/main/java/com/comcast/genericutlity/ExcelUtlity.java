@@ -36,7 +36,16 @@ public class ExcelUtlity {
 	    wb.close();
 		return data;
 	}
-	
+	/**
+	 * read the date based on testId and Required Column name 
+	 * @param filePath
+	 * @param sheetName
+	 * @param testId
+	 * @param columnHeader
+	 * @return
+	 * @throws Throwable
+	 * @throws IOException
+	 */
 	public String getDataFromExcelBasedTestId(String filePath, String sheetName , String testId, String columnHeader ) throws Throwable, IOException {
 		FileInputStream fis1 = new FileInputStream(filePath);
 		Workbook wb =  WorkbookFactory.create(fis1);

@@ -25,6 +25,8 @@ import org.testng.annotations.Test;
 
 import com.comcast.genericutlity.ExcelUtlity;
 import com.comcast.genericutlity.FileUtlity;
+import com.comcast.genericutlity.JavaUtlity;
+import com.comcast.genericutlity.WebActionUtility;
 
 
 
@@ -35,6 +37,9 @@ public class CreateContactSupportDateTest {
 		/*create Object for utlity */
 		FileUtlity fLib = new FileUtlity();
 		ExcelUtlity eLib = new ExcelUtlity();
+		JavaUtlity jLib = new JavaUtlity();
+		WebActionUtility wLib = new WebActionUtility();
+
 		
 		/*get the FILE PATH*/
        String ENV_FILE_PATH =    fLib.getFilePathFromPropertiesFile("projectConfigDataFilePath");
@@ -47,7 +52,7 @@ public class CreateContactSupportDateTest {
 	   String PASSWORd = fLib.getDataFromProperties(ENV_FILE_PATH, "password");
 
 		/*test script data*/
-		int randomNum = new Random().nextInt(3000);
+	   int randomNum = jLib.getRandomNumber();
 		
 		  String lastName = eLib.getDataFromExcelBasedTestId(TEST_SCRIPT_EXCEL_FILE_PATH, "contact", "tc_05", "LastName") +"_"+ randomNum;
 	
@@ -65,9 +70,8 @@ public class CreateContactSupportDateTest {
 		}
 		
 		
+		wLib.waitForElementInDOM(driver);
 		
-		
-		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 		driver.get(URL);
 		driver.findElement(By.name("user_name")).sendKeys(USERNAME);
 		driver.findElement(By.name("user_password")).sendKeys(PASSWORd);
@@ -82,21 +86,15 @@ public class CreateContactSupportDateTest {
 		/*step 4 :  create a new org*/
 		driver.findElement(By.name("lastname")).sendKeys(lastName);
 		
-		Date date = new Date();
-		SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd");
-		String fdate =   sim.format(date);
+       
 		
 		driver.findElement(By.id("jscal_field_support_start_date")).clear();
-		driver.findElement(By.id("jscal_field_support_start_date")).sendKeys(fdate);
+		driver.findElement(By.id("jscal_field_support_start_date")).sendKeys(jLib.getDate());
 		
-		 Calendar cal =  Calendar.getInstance();
-		 cal.add(Calendar.DATE,30);		 
-	     Date date1 =  cal.getTime();	   
-	    String pfdata = sim.format(date1);
-	    System.out.println(pfdata);
+	
 		
 		driver.findElement(By.id("jscal_field_support_end_date")).clear();
-		driver.findElement(By.id("jscal_field_support_end_date")).sendKeys(fdate);
+		driver.findElement(By.id("jscal_field_support_end_date")).sendKeys(jLib.getDate(30));
 		
         driver.findElement(By.xpath("//input[@title='Save [Alt+S]']")).click();
 
@@ -111,8 +109,7 @@ public class CreateContactSupportDateTest {
          
 		/*step 4 :  logout*/
 		WebElement ele =  driver.findElement(By.xpath("//img[@src='themes/softed/images/user.PNG']"));
-        Actions act = new Actions(driver);
-        act.moveToElement(ele).perform();
+        wLib.mouseOverOnElement(driver, ele);
 		driver.findElement(By.linkText("Sign Out")).click();
 		driver.close();
 

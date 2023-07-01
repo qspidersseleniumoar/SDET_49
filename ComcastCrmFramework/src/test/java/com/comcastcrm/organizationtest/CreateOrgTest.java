@@ -1,16 +1,5 @@
 package com.comcastcrm.organizationtest;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.time.Duration;
-import java.util.Properties;
-import java.util.Random;
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -22,6 +11,8 @@ import org.testng.annotations.Test;
 
 import com.comcast.genericutlity.ExcelUtlity;
 import com.comcast.genericutlity.FileUtlity;
+import com.comcast.genericutlity.JavaUtlity;
+import com.comcast.genericutlity.WebActionUtility;
 
 
 
@@ -32,6 +23,8 @@ public class CreateOrgTest {
 		/*create Object for utlity */
 		FileUtlity fLib = new FileUtlity();
 		ExcelUtlity eLib = new ExcelUtlity();
+		JavaUtlity jLib = new JavaUtlity();
+		WebActionUtility wLib = new WebActionUtility();
 		
 		/*get the FILE PATH*/
        String ENV_FILE_PATH =    fLib.getFilePathFromPropertiesFile("projectConfigDataFilePath");
@@ -44,7 +37,7 @@ public class CreateOrgTest {
 	   String PASSWORd = fLib.getDataFromProperties(ENV_FILE_PATH, "password");
        
 		/*test script data*/
-		int randomNum = new Random().nextInt(3000);
+		int randomNum = jLib.getRandomNumber();
 		
 		String orgName = eLib.getDataFromExcelBasedTestId(TEST_SCRIPT_EXCEL_FILE_PATH, "org", "tc_01", "organizationName")+randomNum;
 	
@@ -60,11 +53,7 @@ public class CreateOrgTest {
 		}else {
 		    driver = new ChromeDriver();
 		}
-		
-		
-		
-		
-		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		wLib.waitForElementInDOM(driver);
 		driver.get(URL);
 		driver.findElement(By.name("user_name")).sendKeys(USERNAME);
 		driver.findElement(By.name("user_password")).sendKeys(PASSWORd);
@@ -88,8 +77,7 @@ public class CreateOrgTest {
          
 		/*step 4 :  logout*/
 		WebElement ele =  driver.findElement(By.xpath("//img[@src='themes/softed/images/user.PNG']"));
-        Actions act = new Actions(driver);
-        act.moveToElement(ele).perform();
+        wLib.mouseOverOnElement(driver, ele);
 		driver.findElement(By.linkText("Sign Out")).click();
 		driver.close();
 

@@ -23,6 +23,8 @@ import org.testng.annotations.Test;
 
 import com.comcast.genericutlity.ExcelUtlity;
 import com.comcast.genericutlity.FileUtlity;
+import com.comcast.genericutlity.JavaUtlity;
+import com.comcast.genericutlity.WebActionUtility;
 
 public class CreateOrgWithPhoneNumber {
 	
@@ -31,6 +33,9 @@ public class CreateOrgWithPhoneNumber {
 		/*create Object for utlity */
 		FileUtlity fLib = new FileUtlity();
 		ExcelUtlity eLib = new ExcelUtlity();
+		JavaUtlity jLib = new JavaUtlity();
+		WebActionUtility wLib = new WebActionUtility();
+		
 		
 		/*get the FILE PATH*/
        String ENV_FILE_PATH =    fLib.getFilePathFromPropertiesFile("projectConfigDataFilePath");
@@ -43,7 +48,7 @@ public class CreateOrgWithPhoneNumber {
 	   String PASSWORd = fLib.getDataFromProperties(ENV_FILE_PATH, "password");
 
 		/*test script data*/
-		int randomNum = new Random().nextInt(3000);
+	   int randomNum = jLib.getRandomNumber();
 	
 		
 		
@@ -65,8 +70,7 @@ public class CreateOrgWithPhoneNumber {
 		
 		
 		
-		
-		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+		wLib.waitForElementInDOM(driver);
 		driver.get(URL);
 		driver.findElement(By.name("user_name")).sendKeys(USERNAME);
 		driver.findElement(By.name("user_password")).sendKeys(PASSWORd);
@@ -106,8 +110,7 @@ public class CreateOrgWithPhoneNumber {
         
 		/*step 4 :  logout*/
 		WebElement ele =  driver.findElement(By.xpath("//img[@src='themes/softed/images/user.PNG']"));
-        Actions act = new Actions(driver);
-        act.moveToElement(ele).perform();
+       wLib.mouseOverOnElement(driver, ele);
 		driver.findElement(By.linkText("Sign Out")).click();
 		driver.close();
 
